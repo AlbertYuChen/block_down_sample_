@@ -1,0 +1,3 @@
+[submodule "zi_lib_my"]
+	path = zi_lib_my
+	url = https://github.com/AlbertYuChen/block_down_sample.git
