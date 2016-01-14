@@ -3,7 +3,7 @@ CFLAGS=-lpthread -lrt
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=downsample
-INCLUDES = -I ./zi_lib/external/include -I ./zi_lib/
+INCLUDES = -I ./zi_lib/ -I ./zi_lib/external/include 
 
 all: $(SOURCES) $(EXECUTABLE)
     
