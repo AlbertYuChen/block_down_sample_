@@ -1,7 +1,5 @@
 // #include "boost/multi_array.hpp"
 // #include <cassert>
-#include <zi/concurrency/concurrency.hpp>
-#include <zi/zunit/zunit.hpp>
 
 // void boost_test(){
 //     // Create a 3D array that is 3 x 4 x 2
@@ -27,8 +25,9 @@
 
 
 
+#include <zi/concurrency/concurrency.hpp>
+#include <zi/zunit/zunit.hpp>
 
-ZiSUITE( ZiLib_Concurrency_Tests );
 
 namespace concurrency_tests {
 
@@ -56,7 +55,7 @@ struct barrier_tester: zi::runnable
 
 } // namespace concurrency_tests
 
-ZiTEST( Test_Barrier )
+int main()
 {
     using concurrency_tests::barrier_tester;
 
@@ -75,5 +74,5 @@ ZiTEST( Test_Barrier )
 
         EXPECT_EQ( v, i + 1 );
     }
-
+    return 0;
 }
