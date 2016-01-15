@@ -9,7 +9,7 @@ INCLUDES =
 all: $(SOURCES) $(EXECUTABLE)
     
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) $(CFLAGS) -o $@
 .cpp.o:
 	$(CC) $< $(INCLUDES) $(CFLAGS) -c -o $@
 
