@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-pthread -std=c++11 
+CFLAGS=-pthread -lpthread -std=c++11
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=block_down_sample.exe
