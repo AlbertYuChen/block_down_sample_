@@ -1,9 +1,10 @@
 CC=g++
-CFLAGS=-lpthread -lrt
+CFLAGS=-pthread -std=c++11 
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=downsample
-INCLUDES = -I ./zi_lib/ -I ./zi_lib/external/include 
+EXECUTABLE=block_down_sample.exe
+INCLUDES = 
+# -I ./zi_lib/ -I ./zi_lib/external/include 
 
 all: $(SOURCES) $(EXECUTABLE)
     

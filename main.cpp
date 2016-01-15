@@ -1,78 +1,35 @@
-// #include "boost/multi_array.hpp"
-// #include <cassert>
+// thread1.c
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 
-// void boost_test(){
-//     // Create a 3D array that is 3 x 4 x 2
-//     typedef boost::multi_array<double, 3> array_type;
-//     typedef array_type::index index;
-//     array_type A(boost::extents[3][4][2]);
+void *thread_fnc(void * arg);
 
-//     // Assign values to the elements
-//     int values = 0;
-//     for(index i = 0; i != 3; ++i) 
-//         for(index j = 0; j != 4; ++j)
-//             for(index k = 0; k != 2; ++k)
-//                 A[i][j][k] = values++;
-
-//     // Verify values
-//     int verify = 0;
-//     for(index i = 0; i != 3; ++i) 
-//         for(index j = 0; j != 4; ++j)
-//             for(index k = 0; k != 2; ++k)
-//                 assert(A[i][j][k] == 1 + verify++);
-
-// }
-
-
-
-#include <zi/concurrency/concurrency.hpp>
-#include <zi/zunit/zunit.hpp>
-
-
-namespace concurrency_tests {
-
-struct barrier_tester: zi::runnable
-{
-    barrier_tester( int &v, int count = 1 ):
-        v_( v ), b_( count ), m_()
-    {
-    }
-
-    void run()
-    {
-        if ( b_.wait() )
-        {
-            zi::guard g( m_ );
-            ++v_;
-        }
-    }
-
-    int         &v_;
-    zi::barrier  b_;
-    zi::mutex    m_;
-};
-
-
-} // namespace concurrency_tests
+char thread_msg[] ="Hello Thread!";  // global
 
 int main()
 {
-    using concurrency_tests::barrier_tester;
+        int ret;
+        pthread_t my_thread;
+        void *ret_join;
 
-    for ( int i = 1; i < 10; ++i )
-    {
-        int v = 0;
-        zi::shared_ptr< barrier_tester > bt( new barrier_tester( v, i ) );
+        ret =  pthread_create(&my_thread, NULL, thread_fnc, (void*) thread_msg);
 
-        for ( int j = 0; j < i * ( i + 1 ); ++j )
-        {
-            zi::thread th( bt );
-            th.start();
-        }
+        printf("Waiting for thread to finish...\n");
+        ret = pthread_join(my_thread, &ret_join);
 
-        zi::all_threads::join();
+        printf("Thread joined, it returned %d\n", ret_join);
 
-        EXPECT_EQ( v, i + 1 );
-    }
-    return 0;
+        printf("New thread message: %s\n",(char *)thread_msg);
+        exit(EXIT_SUCCESS);
+}
+
+void *thread_fnc(void *arg)
+{
+        printf("This is thread_fnc(), arg is %s\n", (char *) arg);
+        strcpy(thread_msg,"Bye!");
+        int return_message = 111;
+        pthread_exit((void *)return_message);
 }
