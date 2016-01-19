@@ -12,24 +12,36 @@ my block down sample code implementation.
 */
 
 #include "Block_Down_Sample.hpp"
-// #include "Block_Down_Sample.cpp"
+#include "Block_Down_Sample.cpp"
 
 using namespace std;
 
-int main () {
+int main() {
 
-    vector<int> L= {3,2,4};
-    Block_Down_Sample B(L);
+	typedef boost::multi_array<int, 4> array_type;
+	typedef array_type::index index;
+	array_type A(boost::extents[3][4][2][2]);
 
-    B.Create_Image();
+	// Assign values to the elements
+	int values = 0;
+	for(index i = 0; i != 3; ++i) 
+		for(index j = 0; j != 4; ++j)
+			for(index k = 0; k != 2; ++k)
+				for(index l = 0; l != 2; ++l) {
+					A[i][j][k][l] = values++;
+				}
 
-    B.test();
-	for (auto c : B.v)
-		std::cout << c << ' ';
+	// Verify values
+	int verify = 0;
+	for(index i = 0; i != 3; ++i) 
+		for(index j = 0; j != 4; ++j)
+			for(index k = 0; k != 2; ++k)
+				for(index l = 0; l != 2; ++l) {
+					assert(A[i][j][k][l] == verify++);
+				}
 
-    // for (auto c : B.get_dimension_array())
-    //     std::cout << c<< endl;
-    // cout << B.get_dimension() << endl;
+	Block_Down_Sample<int, 4> B(A);
+	B.test();
 
-    return 0;
+  return 0;
 }
