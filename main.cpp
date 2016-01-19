@@ -1,60 +1,30 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <semaphore.h>
+/* 
+Author: Albert Yu Chen
+Date: Jan 20 2015
+
+NOTE: sample main function to test the block down sample code.
+
+*/
 
 
-pthread_mutex_t mutex;
-pthread_cond_t cond;
+/*
+my block down sample code implementation.
+*/
 
-int buffer[100];
+#include "Block_Down_Sample.hpp"
 
-int loops = 10;
-int length = 0;
+using namespace std;
 
-void *producer(void *arg) {
-    int i;
-    for (i = 0; i < loops; i++) {
-        pthread_mutex_lock(&mutex);
-        buffer[length++] = i;
-        printf("producer length %d\n", length);
-        pthread_cond_signal(&cond);
-        pthread_mutex_unlock(&mutex);
-        if (i % 3 == 0) {
-               sleep(1); 
-        }
-    }
-}
+int main () {
 
-void *consumer(void *arg) {
-    int i;
-    for (i = 0; i < loops; i++) {
-        pthread_mutex_lock(&mutex);
-        while(length == 0) {
-            printf(" consumer waiting...\n");
-            pthread_cond_wait(&cond, &mutex);
-        }
-        int item = buffer[--length];
-        printf("Consumer %d\n", item);
-        pthread_mutex_unlock(&mutex);
-    }
-}
+    vector<int> L= {3,2,4};
+    Block_Down_Sample B(L);
+    B.Create_Image();
 
-int main(int argc, char *argv[])
-{
 
-    pthread_mutex_init(&mutex, 0);
-    pthread_cond_init(&cond, 0);
+    for (auto c : B.get_dimension_array())
+        std::cout << c<< endl;
+    cout << B.get_dimension() << endl;
 
-    pthread_t pThread, cThread;
-    pthread_create(&pThread, 0, producer, 0);
-    pthread_create(&cThread, 0, consumer, 0);
-    pthread_join(pThread, NULL);
-    pthread_join(cThread, NULL);
-
-    pthread_mutex_destroy(&mutex);
-    pthread_cond_destroy(&cond);
     return 0;
 }
