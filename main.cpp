@@ -12,19 +12,20 @@ my block down sample code implementation.
 */
 
 #include "Block_Down_Sample.hpp"
-#include "Block_Down_Sample.cpp"
+// #include "Block_Down_Sample.cpp"
 
 using namespace std;
 
 int main () {
 
     vector<int> L= {3,2,4};
-    Block_Down_Sample<double, 3> B(L);
+    Block_Down_Sample B(L);
 
     B.Create_Image();
 
     B.test();
-
+	for (auto c : B.v)
+		std::cout << c << ' ';
 
     // for (auto c : B.get_dimension_array())
     //     std::cout << c<< endl;

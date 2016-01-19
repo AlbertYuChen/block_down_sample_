@@ -19,25 +19,28 @@ NOTE:
 
 /*
 define the data type of the image, since the boost array is not compatable 
-with template class, so I have to use the define.
+with template class, it can't pass template parameters to boost array,
+so I have to use the define.
 */ 
+#define T int
+#define D 4
 
 using namespace std;
 
-template<class T, long unsigned int dimension>
 class Block_Down_Sample
 {
 	vector<int> dimension_array;
-	typedef boost::multi_array<double, dimension> array_type;
+	typedef boost::multi_array<T, D> array_type;
 	typedef array_type::index index;
 
 public:
+	std::vector<T> v = {5, 4, 6};
+	int M[D] = {5, 4, 6, 2};
 
-	array_type A = array_type(boost::extents[0][0][0]);
+	array_type A = array_type(boost::extents[0][0][0][0]);
 
 	Block_Down_Sample(vector<int> dimension_array){
 		this->dimension_array = dimension_array;
-		// dimension = dimension_array.size();
 
 
 	};
