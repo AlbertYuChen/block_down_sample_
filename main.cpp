@@ -23,6 +23,8 @@ int main () {
 
     B.Create_Image();
 
+    B.test();
+
 
     // for (auto c : B.get_dimension_array())
     //     std::cout << c<< endl;

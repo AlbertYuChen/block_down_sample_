@@ -28,14 +28,12 @@ template<class T, long unsigned int dimension>
 class Block_Down_Sample
 {
 	vector<int> dimension_array;
-
-	// typedef boost::multi_array<T, dimension> array_type;
-	// typedef array_type::index index;
-	// boost::array<array_type::index, 3> shape = {{ 3, 4, 2 }};
-	// array_type A(shape);
-
+	typedef boost::multi_array<double, dimension> array_type;
+	typedef array_type::index index;
 
 public:
+
+	array_type A = array_type(boost::extents[0][0][0]);
 
 	Block_Down_Sample(vector<int> dimension_array){
 		this->dimension_array = dimension_array;
@@ -44,9 +42,9 @@ public:
 
 	};
 
-	
 	void Create_Image();
 
+	void test();
 
 
 	vector<int> get_dimension_array() {return dimension_array;};
