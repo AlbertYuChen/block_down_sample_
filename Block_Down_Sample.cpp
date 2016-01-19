@@ -12,10 +12,10 @@ void Block_Down_Sample<T, N>::test(){
 
 	// typedef boost::multi_array<T, 4>::index b_index;
 
-	for(typename boost::multi_array<T, 4>::index i = 0; i != 3; ++i) 
-			for(boost::multi_array<int, 4>::index j = 0; j != 4; ++j)
-				for(boost::multi_array<int, 4>::index k = 0; k != 2; ++k) 
-					for(boost::multi_array<int, 4>::index l = 0; l != 2; ++l) {
+	for(b_index i = 0; i != 3; ++i) 
+			for(b_index j = 0; j != 4; ++j)
+				for(b_index k = 0; k != 2; ++k) 
+					for(b_index l = 0; l != 2; ++l) {
 						cout << A[i][j][k][l] << ' ';
 					}
 };

@@ -20,7 +20,7 @@ class Block_Down_Sample
 private:
 
 	boost::multi_array<T, N> A;
-	typedef boost::multi_array<T, 4>::index index;
+	typedef typename boost::multi_array<T, 4>::index b_index;
 	typedef std::vector<T> v;
 
 public:
