@@ -18,6 +18,7 @@ I download the library from:
 #include "boost/multi_array.hpp"
 
 #include <cassert>
+#include <typeinfo>
 
 using namespace std;
 
@@ -37,6 +38,9 @@ private:
     boost::array<array_type::index, 4> shape = LL;
     array_type A(shape); */
 	typedef typename boost::array<long int, N> dim_array_t;
+
+/*	the iteration way to access boost array (not multi array)*/
+	typedef typename boost::array<long int, N>::iterator dim_iterator_t;
 
 /*	multi_array is a general purpose container class that models MultiArray.*/
 	typedef typename boost::multi_array<T, N> boost_m_array_t;
@@ -73,12 +77,34 @@ private:
 /*	image variable*/
 	boost_m_array_t IN;
 
-/*	dimension size list*/
+/*	image dimension size list*/
+	dim_array_t D_power;
 	dim_array_t D;
+
+/*	mask block dimension size list*/
+	dim_array_t B_power;
+	dim_array_t B;
 
 public:
 	
-	Block_Down_Sample(boost_m_array_t img, dim_array_t dim) : IN(img), D(dim) {};
+	Block_Down_Sample(
+		boost_m_array_t img, 
+		dim_array_t img_dim, 
+		dim_array_t blk_dim) : 
+			IN(img), 
+			D_power(img_dim),
+			B_power(blk_dim) {
+				
+		for(int i = 0; i < N; i++) {
+			if (D_power[i] < B_power[i]) {
+				cout << "block size is not smaller than image size"; exit (EXIT_FAILURE);
+			}
+			D[i] =  1 << D_power[i]; 
+			B[i] =  1 << B_power[i];
+			cout << D[i] << ':' << D_power[i] << " \n";
+			cout << B[i] << ':' << B_power[i] << " \n";
+		} 
+	};
 
 	void test();
 
