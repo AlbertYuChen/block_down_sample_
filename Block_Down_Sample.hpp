@@ -22,6 +22,9 @@ I download the library from:
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
+#include <iterator>
+#include <map>
 
 using namespace std;
 
@@ -97,13 +100,16 @@ private:
 	/*	How many pixels in the mask block*/
 	int B_size;
 
+	/*	check whether the input data is valid for calculation*/
+	void check_initialization();
+
 public:
 
-	/*	this will print the image in a list, with correspond coordinate.*/
+	/*	this function will print the image in a list, with correspond coordinate.*/
 	void print_img();
 
-	/*	this will view the sub-img using block*/
-	void view_sub_img();
+	/*	this will view the sub-img using block, and find the most common value*/
+	pair<T, int> most_com_from_sub_img();
 
 	/*	class constructor*/
 	Block_Down_Sample(
@@ -113,52 +119,10 @@ public:
 			IN(img), 			// constructor need img input as boost multiple array
 			D(img_dim),			// dimension array
 			B(blk_dim) {		// block dimension size
-
-		/*	judge whether each dimension and block size is valid*/
-		for(int i = 0; i < N; i++) {
-			if (D[i] < B) {
-				cout << "block size is not smaller than image size\n"; exit (EXIT_FAILURE);
-			} else if (B < 0 || D[i] < 0 || (B & (B - 1)) || (D[i] & (D[i] - 1))) {
-				cout << "block size or img size is not power of 2\n"; exit (EXIT_FAILURE);} 
-		} 
-
-		IN_size = 1; B_size = 1;
-		for(int i = 0; i < N; i++) {
-			IN_size *= D[i];
-			B_size *= B;
-		}
+		check_initialization();
 	};
 
 };
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

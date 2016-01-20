@@ -75,7 +75,12 @@ int main() {
 	int B_d = 4;
 	Block_Down_Sample<int, 2> B(A, D, B_d);
 	B.print_img();
-	B.view_sub_img();
+	pair<int, int> x;
+	x = B.most_com_from_sub_img();
+	std::cout << x.first << " " << x.second << "\n";
+
+
+
 
 /*    pthread_t my_thread[NN];
 
