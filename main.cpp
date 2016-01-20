@@ -66,37 +66,26 @@ int main() {
 
 	A[3][0] = 1;
 
-
-
-	// cout << D[0] << "--D[0]\n";
-	// cout << D[1] << "--D[1]\n";
-
-
-	int B_d = 4;
+	int B_d = 2;
 	Block_Down_Sample<int, 2> B(A, D, B_d);
 	B.print_img();
-	pair<int, int> x;
-	x = B.most_com_from_sub_img();
-	std::cout << x.first << " " << x.second << "\n";
+	B.cal_masked_img();
+
+	// pthread_t my_thread[NN];
+
+	// long id;
+	// for(id = 1; id <= NN; id++) {
+	//         int ret =  pthread_create(&my_thread[id], NULL, &Block_Down_Sample<int, 2>::thread_worker, (void*)id);
+	//         if(ret != 0) {
+	//                 printf("Error: pthread_create() failed\n");
+	//                 exit(EXIT_FAILURE);
+	//         }
+	// }
+
+	// pthread_exit(NULL);
 
 
-
-
-/*    pthread_t my_thread[NN];
-
-    long id;
-    for(id = 1; id <= NN; id++) {
-            int ret =  pthread_create(&my_thread[id], NULL, &worker_thread, (void*)id);
-            if(ret != 0) {
-                    printf("Error: pthread_create() failed\n");
-                    exit(EXIT_FAILURE);
-            }
-    }
-
-    pthread_exit(NULL);
-
-
-	return 0;*/
+	return 0;
 }
 
 

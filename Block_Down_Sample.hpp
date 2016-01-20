@@ -82,7 +82,7 @@ private:
 
 	typedef typename boost::multi_array<T, N>::template array_view<N>::type b_view;
 
-	/*	image variable*/
+	/*	original image */
 	boost_m_array_t IN;
 
 	/*	image dimension size list
@@ -103,13 +103,22 @@ private:
 	/*	check whether the input data is valid for calculation*/
 	void check_initialization();
 
+	/*	this will view the sub-img using block, and find the most common value*/
+	T most_com_from_sub_img(co_index entr);
+
+	/*	worker functino for each thread*/
+	static void * thread_worker(void *arg);
+
+	/*	number of threads will be used in the calculation */
+	int M_thread = 4;
+
 public:
+
+	/*	calculate masked image by block down sampling*/
+	void cal_masked_img();
 
 	/*	this function will print the image in a list, with correspond coordinate.*/
 	void print_img();
-
-	/*	this will view the sub-img using block, and find the most common value*/
-	pair<T, int> most_com_from_sub_img();
 
 	/*	class constructor*/
 	Block_Down_Sample(
@@ -123,6 +132,5 @@ public:
 	};
 
 };
-
 
 #endif

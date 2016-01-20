@@ -6,29 +6,67 @@ Date: Jan 20 2015
 
 #include "Block_Down_Sample.hpp"
 
+/*	worker functino for each thread*/
+template <class T, int N>
+void Block_Down_Sample<T, N>::cal_masked_img(){
+
+	pthread_t my_thread[M_thread];
+
+	long id;
+	for(id = 1; id <= M_thread; id++) {
+	        int ret =  pthread_create(&my_thread[id], NULL, &thread_worker, (void*)id);
+	        if(ret != 0) {
+	                printf("Error: pthread_create() failed\n");
+	                exit(EXIT_FAILURE);
+	        }
+	}
+
+    pthread_exit(NULL);
+};
+
+/*	worker functino for each thread*/
+template <class T, int N>
+static void * Block_Down_Sample<T, N>::thread_worker(void *arg){
+
+	// co_index entr;
+	// entr[0] = 1;
+	// entr[1] = 3;
+	// most_com_from_sub_img(entr);
+
+    printf("This is worker_thread #%ld\n", (long)arg);
+    pthread_exit(NULL);
+};
+
 /*	I know introducing boost_m_array_t::index_gen would accelarate the calculation,
 but the boost_m_array_t::index_gen and boost::indices only works with fixed 
 dimension, but in dimension varying cases, this is not the option, even it can 
 make code faster*/
 template <class T, int N>
-pair<T, int> Block_Down_Sample<T, N>::most_com_from_sub_img(){
+T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 
-	co_index img_index;
-	std::fill( img_index.begin(), img_index.end(), 0);
-
+	co_index img_offset_index;
+	std::fill( img_offset_index.begin(), img_offset_index.end(), 0);
+	/*	a map, used to counter the most common entry*/
 	std::map<T, int> M_counter;
 
 	int counter[N] = {0};
 	for (int i = 0; i < B_size; ++i) {
-		cout << img_index[0] << "," << img_index[1]<< " > " << IN(img_index) << "\n";
-		M_counter[IN(img_index)]++;
 
-		img_index[N-1]++;
+		/*	entr is the entrence of the original image,  
+		the index of block = entrence + offset. 
+		img_offset_index will help to walk through the block*/
+		cout << entr[0] << "," << entr[1] << " > " << IN(entr) << "\n";
+		M_counter[IN(entr)]++;
+
+		img_offset_index[N-1]++;
+		entr[N-1]++;
 		for (int j = N - 1; j >= 0; --j) {
-			img_index[j] += counter[j];
+			img_offset_index[j] += counter[j];
+			entr[j] += counter[j];
 			counter[j] = 0;
-			if (img_index[j] >= B) {
-				img_index[j] = 0;
+			if (img_offset_index[j] >= B) {
+				img_offset_index[j] = 0;
+				entr[j] -= B;
 				counter[j - 1] = 1;
 			}
 		}
@@ -41,9 +79,9 @@ pair<T, int> Block_Down_Sample<T, N>::most_com_from_sub_img(){
 	auto x = std::max_element(M_counter.begin(), M_counter.end(),
     [](const pair<T, int> p1, const pair<T, int> p2) {
         return p1.second < p2.second; });
-	std::cout << x->first << " " << x->second << "\n";
-	
-	return {x->first, x->second};
+	std::cout << "most comm: " << x->first << ", frequency" << x->second << "\n";
+
+	return x->first;
 };
 
 /*	this function will print the image in a list, with correspond coordinate.*/
@@ -86,7 +124,8 @@ void Block_Down_Sample<T, N>::check_initialization(){
 			exit (EXIT_FAILURE);
 		} else if (B < 0 || D[i] < 0 || (B & (B - 1)) || (D[i] & (D[i] - 1))) {
 			cout << "block size or img size is not power of 2\n"; 
-			exit (EXIT_FAILURE);} 
+			exit (EXIT_FAILURE);
+		} 
 	} 
 
 	IN_size = 1; B_size = 1;
