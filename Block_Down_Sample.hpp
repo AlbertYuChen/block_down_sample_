@@ -33,19 +33,23 @@ class Block_Down_Sample
 {
 private:
 
-/*	define the type of the dimension array, need to be consistant with the boost
+	/*	define the type of the dimension array, need to be consistant with the boost
 	default array shape settings, which usually used in the following case.
     boost::array<array_type::index, 4> shape = LL;
     array_type A(shape); */
 	typedef typename boost::array<long int, N> dim_array_t;
 
-/*	the iteration way to access boost array (not multi array)*/
+	/*	the iteration way to access boost array (not multi array)
+	example:
+	for(dim_iterator_t iter(a.begin()); iter != a.end(); ++iter) {
+	    cout << *iter << "\n";
+	}*/
 	typedef typename boost::array<long int, N>::iterator dim_iterator_t;
 
-/*	multi_array is a general purpose container class that models MultiArray.*/
+	/*	multi_array is a general purpose container class that models MultiArray.*/
 	typedef typename boost::multi_array<T, N> boost_m_array_t;
 
-/*	The Boost.MultiArray components provide two ways of accessing specific 
+	/*	The Boost.MultiArray components provide two ways of accessing specific 
 	elements within a container. 
 	The first uses the traditional C array notation, provided by operator[]. 
 	example:
@@ -55,7 +59,7 @@ private:
 		}*/
 	typedef typename boost::multi_array<T, N>::index op_index;
 
-/*	The second method involves passing a Collection of indices to operator(). 
+	/*	The second method involves passing a Collection of indices to operator(). 
 	N indices will be retrieved from the Collection for the N  dimensions of the 
 	container.
 	This can be useful for writing dimension-independent code, and under some 
@@ -65,7 +69,7 @@ private:
 	cout << A(idx); */
 	typedef typename boost::array<op_index,N> co_index;
 
-/*	Boost.MultiArray provides the facilities for creating a sub-view of an 
+	/*	Boost.MultiArray provides the facilities for creating a sub-view of an 
 	already existing array component. It allows you to create a sub-view that 
 	retains the same number of dimensions as the original array or one that has 
 	less dimensions than the original as well. */
@@ -74,39 +78,37 @@ private:
 	typedef typename boost::multi_array<T, N>::template array_view<N>::type b_view;
 
 
-/*	image variable*/
+	/*	image variable*/
 	boost_m_array_t IN;
 
-/*	image dimension size list*/
-	dim_array_t D_power;
+	/*	image dimension size list*/
 	dim_array_t D;
 
-/*	mask block dimension size list*/
-	dim_array_t B_power;
-	dim_array_t B;
+	/*	mask block dimension size list*/
+	int B;
 
 public:
-	
+
+	/*	this will print the image in a list, with correspond coordinate.*/
+	void print_img();
+
+
 	Block_Down_Sample(
 		boost_m_array_t img, 
 		dim_array_t img_dim, 
-		dim_array_t blk_dim) : 
-			IN(img), 
-			D_power(img_dim),
-			B_power(blk_dim) {
-				
+		int blk_dim) : 
+			IN(img), 			// constructor need img input as boost multiple array
+			D(img_dim),			// dimension array
+			B(blk_dim) {		// block dimension size
+
+		/*	judge whether each dimension and block size is valid*/
 		for(int i = 0; i < N; i++) {
-			if (D_power[i] < B_power[i]) {
-				cout << "block size is not smaller than image size"; exit (EXIT_FAILURE);
-			}
-			D[i] =  1 << D_power[i]; 
-			B[i] =  1 << B_power[i];
-			cout << D[i] << ':' << D_power[i] << " \n";
-			cout << B[i] << ':' << B_power[i] << " \n";
+			if (D[i] < B) {
+				cout << "block size is not smaller than image size\n"; exit (EXIT_FAILURE);
+			} else if (B < 0 || D[i] < 0 || (B & (B - 1)) || (D[i] & (D[i] - 1))) {
+				cout << "block size or img size is not power of 2\n"; exit (EXIT_FAILURE);} 
 		} 
 	};
-
-	void test();
 
 };
 
