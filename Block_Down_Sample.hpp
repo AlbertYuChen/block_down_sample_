@@ -19,9 +19,11 @@ I download the library from:
 
 #include <cassert>
 #include <typeinfo>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
-
 
 /*
 template parameters describes the data type of the image and the dimension of 
@@ -33,8 +35,8 @@ class Block_Down_Sample
 {
 private:
 
-	/*	define the type of the dimension array, need to be consistant with the boost
-	default array shape settings, which usually used in the following case.
+	/*	define the type of the dimension array, need to be consistant with the 
+	boost default array shape settings, which usually used in the following case.
     boost::array<array_type::index, 4> shape = LL;
     array_type A(shape); */
 	typedef typename boost::array<long int, N> dim_array_t;
@@ -77,22 +79,33 @@ private:
 
 	typedef typename boost::multi_array<T, N>::template array_view<N>::type b_view;
 
-
 	/*	image variable*/
 	boost_m_array_t IN;
 
-	/*	image dimension size list*/
+	/*	image dimension size list
+	boost::array<long int, 2> D = {{4, 8}};
+	Here, 4 is index 0, 8 is in index 1, but the right side is the lower bit, and
+	the left side is the higher bit*/
 	dim_array_t D;
 
 	/*	mask block dimension size list*/
 	int B;
+
+	/*	How many pixels in the image*/
+	int IN_size;
+
+	/*	How many pixels in the mask block*/
+	int B_size;
 
 public:
 
 	/*	this will print the image in a list, with correspond coordinate.*/
 	void print_img();
 
+	/*	this will view the sub-img using block*/
+	void view_sub_img();
 
+	/*	class constructor*/
 	Block_Down_Sample(
 		boost_m_array_t img, 
 		dim_array_t img_dim, 
@@ -108,6 +121,12 @@ public:
 			} else if (B < 0 || D[i] < 0 || (B & (B - 1)) || (D[i] & (D[i] - 1))) {
 				cout << "block size or img size is not power of 2\n"; exit (EXIT_FAILURE);} 
 		} 
+
+		IN_size = 1; B_size = 1;
+		for(int i = 0; i < N; i++) {
+			IN_size *= D[i];
+			B_size *= B;
+		}
 	};
 
 };

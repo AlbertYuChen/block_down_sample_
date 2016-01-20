@@ -3,7 +3,7 @@
 
 # I'm using gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04) 
 CC=g++
-CFLAGS= -pthread -lpthread -std=c++11
+CFLAGS= -pthread -lpthread -std=c++11 -fpermissive
 SOURCES=Block_Down_Sample.cpp main.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=block_down_sample.exe
