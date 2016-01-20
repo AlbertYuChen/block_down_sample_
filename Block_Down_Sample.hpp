@@ -10,7 +10,7 @@ NOTE:
 
 
 /*
-the documentation is available through:
+the boost multi array documentation is available through:
 http://www.boost.org/doc/libs/master/libs/multi_array/doc/user.html
 I download the library from:
 
@@ -32,8 +32,14 @@ class Block_Down_Sample
 {
 private:
 
+/*	define the type of the dimension array, need to be consistant with the boost
+	default array shape settings, which usually used in the following case.
+    boost::array<array_type::index, 4> shape = LL;
+    array_type A(shape); */
+	typedef typename boost::array<long int, N> dim_array_t;
+
 /*	multi_array is a general purpose container class that models MultiArray.*/
-	typedef typename boost::multi_array<T, N> boost_array_type;
+	typedef typename boost::multi_array<T, N> boost_m_array_t;
 
 /*	The Boost.MultiArray components provide two ways of accessing specific 
 	elements within a container. 
@@ -41,7 +47,7 @@ private:
 	example:
 	for(op_index k = 0; k != 2; ++k) 
 		for(op_index l = 0; l != 2; ++l) {
-			cout << A[k][l] << ' ';
+			cout << A[k][l];
 		}*/
 	typedef typename boost::multi_array<T, N>::index op_index;
 
@@ -52,7 +58,7 @@ private:
 	compilers may yield higher performance than operator[]. 
 	example:
 	co_index idx = {{i,j,k,l}};
-	cout << A(idx) << ' '; */
+	cout << A(idx); */
 	typedef typename boost::array<op_index,N> co_index;
 
 /*	Boost.MultiArray provides the facilities for creating a sub-view of an 
@@ -61,16 +67,18 @@ private:
 	less dimensions than the original as well. */
 	typedef typename boost::multi_array_types::index_range b_range;
 
-	// typedef typename boost::multi_array<int, N>::array_view<N>::type b_view;
-	typedef typename boost::multi_array<int, 4>::array_view<N>::type b_view;
+	typedef typename boost::multi_array<T, N>::template array_view<N>::type b_view;
 
 
 /*	image variable*/
-	boost_array_type A;
+	boost_m_array_t IN;
+
+/*	dimension size list*/
+	dim_array_t D;
 
 public:
 	
-	Block_Down_Sample(boost::multi_array<T, N> input_array) : A(input_array) {};
+	Block_Down_Sample(boost_m_array_t img, dim_array_t dim) : IN(img), D(dim) {};
 
 	void test();
 
