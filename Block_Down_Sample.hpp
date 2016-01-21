@@ -103,11 +103,14 @@ private:
 	/*	How many pixels in the image*/
 	int IN_size;
 
-	/*	How many pixels in the mask block*/
+	/*	How many pixels in the output img block*/
 	int OUT_size;
 
+	/*	How many pixels in the scannig block */
+	int B_size;
+
 	/*	number of threads will be used in the calculation */
-	int M_thread = 1;
+	int M_thread;
 
 	/*	this is the input argument struct designed for pthread_create, the 
 	first void * member is used to pass this class, so that other functions
@@ -133,7 +136,7 @@ private:
 public:
 
 	/*	calculate masked image by block down sampling*/
-	void cal_masked_img();
+	void cal_masked_img(int number_threads);
 
 	/*	this function will print the original image in a list.*/
 	void print_original_img();

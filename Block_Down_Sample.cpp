@@ -8,14 +8,15 @@ Date: Jan 20 2015
 
 /*	worker function for each thread*/
 template <class T, int N>
-void Block_Down_Sample<T, N>::cal_masked_img(){
-
+void Block_Down_Sample<T, N>::cal_masked_img(int number_threads){
+	M_thread = number_threads;
 	pthread_t my_thread[M_thread];
 
 	for(int id = 1; id <= M_thread; id++) {
 		co_index entr;
 		entr[0] = 0;
 		entr[1] = 0;
+		entr = counter_to_co_index(entr, (id - 1) * B);
 
 		pthread_arg * arg = new pthread_arg();
 		arg->call_class = (void *)this;
@@ -41,15 +42,41 @@ void * Block_Down_Sample<T, N>::thread_worker(void * arg) {
 	cout << my_entr[0] << "+" << my_entr[1] << "\n";
 	Block_Down_Sample * c = (Block_Down_Sample *) ((pthread_arg * )arg)->call_class;
 
-	for (int i = 0; i < N; ++i) {
-		if (my_entr[i] + c->B - 1 > c->D[i]) {
-			pthread_exit(NULL);
-		}
+	if (my_entr[0] + c->B - 1 >= c->D[0]) {
+		pthread_exit(NULL);
 	}
-	c->most_com_from_sub_img(my_entr);
+
+	co_index OUT_entr;
+	for (int i = 0; i < N; ++i)	{
+		OUT_entr[i] = my_entr[i] / c->B;
+	}
+	c->OUT(OUT_entr) = c->most_com_from_sub_img(my_entr);
 	((pthread_arg * )arg)->entr = c->counter_to_co_index(my_entr, c->B * c->M_thread);
 
 	thread_worker(arg);   
+};
+
+/*	this will convert the steps walked along img to the position on the img.*/
+template <class T, int N>
+typename Block_Down_Sample<T, N>::co_index Block_Down_Sample<T, N>::counter_to_co_index(co_index entr_index, int step_counter){
+
+	int counter[N] = {0};
+	for (int i = 0; i < step_counter; ++i) {
+		entr_index[N-1]++;
+		for (int j = N-1; j >= 0; --j) {
+
+			entr_index[j] += counter[j];
+			counter[j] = 0;
+			if (entr_index[j] >= D[j] && j > 0) {
+				entr_index[j] = 0;
+				counter[j - 1] = B;
+			}
+		}
+	}
+
+	// cout << entr_index[0] << "," << entr_index[1]<< " # " << IN(entr_index) << "\n";
+
+	return entr_index;
 };
 
 /*	I know introducing boost_m_array_t::index_gen would accelarate the calculation,
@@ -65,7 +92,7 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	std::map<T, int> M_counter;
 
 	int counter[N] = {0};
-	for (int i = 0; i < OUT_size; ++i) {
+	for (int i = 0; i < B_size; ++i) {
 
 		/*	entr is the entrence of the original image,  
 		the index of block = entrence + offset. 
@@ -87,9 +114,9 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 		}
 	}
 
-	for(typename map<T, int>::const_iterator it = M_counter.begin(); it != M_counter.end(); ++it) {
-	    std::cout << it->first << " " << it->second << "\n";
-	}
+	// for(typename map<T, int>::const_iterator it = M_counter.begin(); it != M_counter.end(); ++it) {
+	//     std::cout << it->first << " " << it->second << "\n";
+	// }
 
 	auto x = std::max_element(M_counter.begin(), M_counter.end(),
     [](const pair<T, int> p1, const pair<T, int> p2) {
@@ -97,28 +124,6 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	std::cout << "most comm: " << x->first << ", frequency" << x->second << "\n";
 
 	return x->first;
-};
-
-/*	this will convert the steps walked along img to the position on the img.*/
-template <class T, int N>
-typename Block_Down_Sample<T, N>::co_index Block_Down_Sample<T, N>::counter_to_co_index(co_index entr_index, int step_counter){
-
-	int counter[N] = {0};
-	for (int i = 0; i < step_counter; ++i) {
-		entr_index[N-1]++;
-		for (int j = N-1; j >= 0; --j) {
-			entr_index[j] += counter[j];
-			counter[j] = 0;
-			if (entr_index[j] >= D[j]) {
-				entr_index[j] = 0;
-				counter[j - 1] = B;
-			}
-		}
-	}
-
-	cout << entr_index[0] << "," << entr_index[1]<< " # " << IN(entr_index) << "\n";
-
-	return entr_index;
 };
 
 /*	this function will print the image in a list, with correspond coordinate.*/
@@ -195,10 +200,11 @@ void Block_Down_Sample<T, N>::check_initialization(){
 		d[i] = D[i] >> 1;
 	OUT.resize(d);
 
-	IN_size = 1; OUT_size = 1;
+	IN_size = 1; OUT_size = 1; B_size = 1;
 	for(int i = 0; i < N; i++) {
 		IN_size *= D[i];
 		OUT_size *= d[i];
+		B_size *= B;
 	}
 
 };
