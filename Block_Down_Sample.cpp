@@ -14,8 +14,7 @@ void Block_Down_Sample<T, N>::cal_masked_img(int number_threads){
 
 	for(int id = 1; id <= M_thread; id++) {
 		co_index entr;
-		entr[0] = 0;
-		entr[1] = 0;
+		std::fill( entr.begin(), entr.end(), 0);
 		entr = counter_to_co_index(entr, (id - 1) * B);
 
 		pthread_arg * arg = new pthread_arg();
@@ -31,7 +30,6 @@ void Block_Down_Sample<T, N>::cal_masked_img(int number_threads){
 		int ret = pthread_join(my_thread[id], 0);
 		if(ret != 0) {  perror("pthread_join failed"); exit(EXIT_FAILURE);}
 	}
-
 };
 
 /*	worker functino for each thread*/
@@ -114,9 +112,9 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 		}
 	}
 
-	// for(typename map<T, int>::const_iterator it = M_counter.begin(); it != M_counter.end(); ++it) {
-	//     std::cout << it->first << " " << it->second << "\n";
-	// }
+	for(typename map<T, int>::const_iterator it = M_counter.begin(); it != M_counter.end(); ++it) {
+	    std::cout << it->first << " " << it->second << "\n";
+	}
 
 	auto x = std::max_element(M_counter.begin(), M_counter.end(),
     [](const pair<T, int> p1, const pair<T, int> p2) {
@@ -143,7 +141,10 @@ void Block_Down_Sample<T, N>::print_original_img(){
 	represents the higher bit of boost multi_array*/
 	int counter[N] = {0};
 	for (int i = 0; i < IN_size; ++i) {
-		cout << img_index[0] << "," << img_index[1]<< " : " << IN(img_index) << "\n";
+		for (int i = 0; i < N - 1; ++i)
+			cout << img_index[i] << ",";
+		cout << img_index[N-1] << " : ";
+		cout << IN(img_index) << "\n";
 		img_index[N-1]++;
 		for (int j = N-1; j >= 0; --j) {
 			img_index[j] += counter[j];
@@ -168,7 +169,10 @@ void Block_Down_Sample<T, N>::print_output_img(){
 	cout << "====== output img =======\n";
 	int counter[N] = {0};
 	for (int i = 0; i < OUT_size; ++i) {
-		cout << img_index[0] << "," << img_index[1]<< " : " << OUT(img_index) << "\n";
+		for (int i = 0; i < N - 1; ++i)
+			cout << img_index[i] << ",";
+		cout << img_index[N-1] << " : ";
+		cout << OUT(img_index) << "\n";
 		img_index[N-1]++;
 		for (int j = N-1; j >= 0; --j) {
 			img_index[j] += counter[j];
@@ -197,7 +201,7 @@ void Block_Down_Sample<T, N>::check_initialization(){
 	} 
 
 	for (int i = 0; i < N; ++i)
-		d[i] = D[i] >> 1;
+		d[i] = D[i] / B;
 	OUT.resize(d);
 
 	IN_size = 1; OUT_size = 1; B_size = 1;
