@@ -10,7 +10,7 @@ NOTE: sample main function to test the block down sample code.
 
 using namespace std;
 
-#define  EXAMPLE 4
+#define  EXAMPLE 4 // <<<<<<======  choose numbers from 1 2 3 4 to run examples
 
 int main() {
 
@@ -48,7 +48,7 @@ int main() {
 
 
 
-	// B.print_original_img();
+	B.print_original_img();
 	// choose the number of threads you are going to use
 	B.cal_masked_img(2);
 	B.print_output_img();
@@ -165,11 +165,11 @@ int main() {
 
 	typedef boost::multi_array<int, 6> array_type;
 	typedef array_type::index index;
-	boost::array<long int, 6> D = {{4, 2, 4, 4, 2, 2}};
+	boost::array<long int, 6> D = {{4, 2, 4, 8, 2, 2}};
 	boost::array<array_type::index, 6> shape = D;
 	array_type A(shape);
-	std::fill( A.origin(), A.origin() + 512, 0);
-	for (auto c = A.origin(); c < A.origin() + 512; c ++) 
+	std::fill( A.origin(), A.origin() + 1024, 0);
+	for (auto c = A.origin(); c < A.origin() + 1024; c ++) 
 		*c = (int)(rand() % 3);
 
 	// here is the block size, you can select 1, 2, 4, 8
@@ -183,7 +183,3 @@ int main() {
 
 	return 0;
 }
-
-
-
-

@@ -2,6 +2,7 @@
 BLOCK_DOWN_SAMPLE.cpp
 Author: Albert Yu Chen
 Date: Jan 20 2015
+NOTE: 
 */
 
 #include "Block_Down_Sample.hpp"
@@ -35,9 +36,7 @@ void Block_Down_Sample<T, N>::cal_masked_img(int number_threads){
 /*	worker functino for each thread*/
 template <class T, int N>
 void * Block_Down_Sample<T, N>::thread_worker(void * arg) {
-	printf("This is worker_thread #%d \n", ((pthread_arg * )arg)->t_id);
 	co_index my_entr = (((pthread_arg * )arg)->entr);
-	cout << my_entr[0] << "+" << my_entr[1] << "\n";
 	Block_Down_Sample * c = (Block_Down_Sample *) ((pthread_arg * )arg)->call_class;
 
 	if (my_entr[0] + c->B - 1 >= c->D[0]) {
@@ -88,16 +87,13 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	std::fill( img_offset_index.begin(), img_offset_index.end(), 0);
 	/*	a map, used to counter the most common entry*/
 	std::map<T, int> M_counter;
-
 	int counter[N] = {0};
 	for (int i = 0; i < B_size; ++i) {
 
 		/*	entr is the entrence of the original image,  
 		the index of block = entrence + offset. 
 		img_offset_index will help to walk through the block*/
-		cout << entr[0] << "," << entr[1] << " > " << IN(entr) << "\n";
 		M_counter[IN(entr)]++;
-
 		img_offset_index[N-1]++;
 		entr[N-1]++;
 		for (int j = N - 1; j >= 0; --j) {
@@ -112,15 +108,9 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 		}
 	}
 
-	for(typename map<T, int>::const_iterator it = M_counter.begin(); it != M_counter.end(); ++it) {
-	    std::cout << it->first << " " << it->second << "\n";
-	}
-
 	auto x = std::max_element(M_counter.begin(), M_counter.end(),
     [](const pair<T, int> p1, const pair<T, int> p2) {
         return p1.second < p2.second; });
-	std::cout << "most comm: " << x->first << ", frequency" << x->second << "\n";
-
 	return x->first;
 };
 
@@ -156,7 +146,7 @@ void Block_Down_Sample<T, N>::print_original_img(){
 		}
 	}
 
-	cout << "====== end original img ======\n";
+	cout << "====== end original img ======\n\n\n";
 };
 
 /*	this function will print the output image in a list, the algorithm is the same
@@ -212,26 +202,3 @@ void Block_Down_Sample<T, N>::check_initialization(){
 	}
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

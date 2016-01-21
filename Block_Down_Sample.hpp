@@ -38,7 +38,7 @@ class Block_Down_Sample
 {
 private:
 
-	/*	define the type of the dimension array, need to be consistant with the 
+	/*	define the type of the dimension array, need to be consistent with the 
 	boost default array shape settings, which usually used in the following case.
     boost::array<array_type::index, 4> shape = LL;
     array_type A(shape); */
@@ -106,13 +106,13 @@ private:
 	/*	How many pixels in the output img block*/
 	int OUT_size;
 
-	/*	How many pixels in the scannig block */
+	/*	How many pixels in the scanning block */
 	int B_size;
 
 	/*	number of threads will be used in the calculation */
 	int M_thread;
 
-	/*	this is the input argument struct designed for pthread_create, the 
+	/*	this is the input argument structure designed for pthread_create, the 
 	first void * member is used to pass this class, so that other functions
 	could be called without declaring static*/
 	struct pthread_arg {
