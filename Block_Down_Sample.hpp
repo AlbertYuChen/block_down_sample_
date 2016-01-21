@@ -106,6 +106,18 @@ private:
 	/*	How many pixels in the mask block*/
 	int OUT_size;
 
+	/*	number of threads will be used in the calculation */
+	int M_thread = 2;
+
+	/*	this is the input argument struct designed for pthread_create, the 
+	first void * member is used to pass this class, so that other functions
+	could be called without declaring static*/
+	struct pthread_arg {
+		void * call_class;
+		co_index entr;
+		int t_id;
+	};
+
 	/*	check whether the input data is valid for calculation*/
 	void check_initialization();
 
@@ -114,14 +126,6 @@ private:
 
 	/*	worker functino for each thread*/
 	static void * thread_worker(void *arg);
-
-	/*	number of threads will be used in the calculation */
-	int M_thread = 2;
-
-	struct pthread_arg {
-		void * call_class;
-		co_index entr;
-	};
 
 public:
 

@@ -6,7 +6,7 @@ Date: Jan 20 2015
 
 #include "Block_Down_Sample.hpp"
 
-/*	worker functino for each thread*/
+/*	worker function for each thread*/
 template <class T, int N>
 void Block_Down_Sample<T, N>::cal_masked_img(){
 
@@ -14,14 +14,16 @@ void Block_Down_Sample<T, N>::cal_masked_img(){
 
 	for(int id = 1; id <= M_thread; id++) {
 		co_index entr;
-		entr[0] = 1;
-		entr[1] = 3;
-		pthread_arg arg;
-		arg.call_class = (void *)this;
-		arg.entr = entr;
+		entr[0] = id;
+		entr[1] = id + 1;
 
-        int ret =  pthread_create(&my_thread[id], NULL, thread_worker, (void *)&arg);
-		if(ret != 0) { perror("pthread_create failed\n"); exit(EXIT_FAILURE); }
+		pthread_arg * arg = new pthread_arg();
+		arg->call_class = (void *)this;
+		arg->entr = entr;
+		arg->t_id = id;
+
+        int ret =  pthread_create(&my_thread[id], NULL, thread_worker, (void *)arg);
+		if(ret != 0) { perror("pthread_create failed\n"); exit(EXIT_FAILURE);}
 	}
 
 	for(int id = 1; id <= M_thread; id++) {
@@ -34,7 +36,7 @@ void Block_Down_Sample<T, N>::cal_masked_img(){
 /*	worker functino for each thread*/
 template <class T, int N>
 void * Block_Down_Sample<T, N>::thread_worker(void * arg) {
-	printf("This is worker_thread #%d \n",  11);
+	printf("This is worker_thread #%d \n", (((pthread_arg * )arg)->t_id) );
 
 	co_index my_entr = (co_index)(((pthread_arg * )arg)->entr);
 	((Block_Down_Sample *) ((pthread_arg * )arg)->call_class)->most_com_from_sub_img(my_entr);
