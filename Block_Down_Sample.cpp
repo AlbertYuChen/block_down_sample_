@@ -14,8 +14,8 @@ void Block_Down_Sample<T, N>::cal_masked_img(){
 
 	for(int id = 1; id <= M_thread; id++) {
 		co_index entr;
-		entr[0] = id;
-		entr[1] = id + 1;
+		entr[0] = 0;
+		entr[1] = 0;
 
 		pthread_arg * arg = new pthread_arg();
 		arg->call_class = (void *)this;
@@ -36,12 +36,20 @@ void Block_Down_Sample<T, N>::cal_masked_img(){
 /*	worker functino for each thread*/
 template <class T, int N>
 void * Block_Down_Sample<T, N>::thread_worker(void * arg) {
-	printf("This is worker_thread #%d \n", (((pthread_arg * )arg)->t_id) );
+	printf("This is worker_thread #%d \n", ((pthread_arg * )arg)->t_id);
+	co_index my_entr = (((pthread_arg * )arg)->entr);
+	cout << my_entr[0] << "+" << my_entr[1] << "\n";
+	Block_Down_Sample * c = (Block_Down_Sample *) ((pthread_arg * )arg)->call_class;
 
-	co_index my_entr = (co_index)(((pthread_arg * )arg)->entr);
-	((Block_Down_Sample *) ((pthread_arg * )arg)->call_class)->most_com_from_sub_img(my_entr);
+	for (int i = 0; i < N; ++i) {
+		if (my_entr[i] + c->B - 1 > c->D[i]) {
+			pthread_exit(NULL);
+		}
+	}
+	c->most_com_from_sub_img(my_entr);
+	((pthread_arg * )arg)->entr = c->counter_to_co_index(my_entr, c->B * c->M_thread);
 
-    pthread_exit(NULL);
+	thread_worker(arg);   
 };
 
 /*	I know introducing boost_m_array_t::index_gen would accelarate the calculation,
@@ -91,13 +99,35 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	return x->first;
 };
 
+/*	this will convert the steps walked along img to the position on the img.*/
+template <class T, int N>
+typename Block_Down_Sample<T, N>::co_index Block_Down_Sample<T, N>::counter_to_co_index(co_index entr_index, int step_counter){
+
+	int counter[N] = {0};
+	for (int i = 0; i < step_counter; ++i) {
+		entr_index[N-1]++;
+		for (int j = N-1; j >= 0; --j) {
+			entr_index[j] += counter[j];
+			counter[j] = 0;
+			if (entr_index[j] >= D[j]) {
+				entr_index[j] = 0;
+				counter[j - 1] = B;
+			}
+		}
+	}
+
+	cout << entr_index[0] << "," << entr_index[1]<< " # " << IN(entr_index) << "\n";
+
+	return entr_index;
+};
+
 /*	this function will print the image in a list, with correspond coordinate.*/
 template <class T, int N>
 void Block_Down_Sample<T, N>::print_original_img(){
 
 	co_index img_index;
 	std::fill( img_index.begin(), img_index.end(), 0);
-
+	cout << "====== original img =======\n";
 	/*	the algorithm to walk through every image point is the same as digital 
 	counter, which it will always increase the lowest bit, and will yield a 
 	counter bit if necessary to higher bit. The lowest bit is img_index[N-1], 
@@ -119,6 +149,32 @@ void Block_Down_Sample<T, N>::print_original_img(){
 			}
 		}
 	}
+
+	cout << "====== end original img ======\n";
+};
+
+/*	this function will print the output image in a list, the algorithm is the same
+as the void print_original_img() */
+template <class T, int N>
+void Block_Down_Sample<T, N>::print_output_img(){
+
+	co_index img_index;
+	std::fill( img_index.begin(), img_index.end(), 0);
+	cout << "====== output img =======\n";
+	int counter[N] = {0};
+	for (int i = 0; i < OUT_size; ++i) {
+		cout << img_index[0] << "," << img_index[1]<< " : " << OUT(img_index) << "\n";
+		img_index[N-1]++;
+		for (int j = N-1; j >= 0; --j) {
+			img_index[j] += counter[j];
+			counter[j] = 0;
+			if (img_index[j] >= d[j]) {
+				img_index[j] = 0;
+				counter[j - 1] = 1;
+			}
+		}
+	}
+	cout << "====== end output img =====\n";
 };
 
 /*	check whether the input data is valid for calculation*/
@@ -135,15 +191,16 @@ void Block_Down_Sample<T, N>::check_initialization(){
 		} 
 	} 
 
-	IN_size = 1; OUT_size = 1;
-	for(int i = 0; i < N; i++) {
-		IN_size *= D[i];
-		OUT_size *= B;
-	}
-
 	for (int i = 0; i < N; ++i)
 		d[i] = D[i] >> 1;
 	OUT.resize(d);
+
+	IN_size = 1; OUT_size = 1;
+	for(int i = 0; i < N; i++) {
+		IN_size *= D[i];
+		OUT_size *= d[i];
+	}
+
 };
 
 

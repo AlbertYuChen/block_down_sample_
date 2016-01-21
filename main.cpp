@@ -59,6 +59,7 @@ int main() {
 	Block_Down_Sample<int, 2> B(A, D, B_d);
 	// B.print_original_img();
 	B.cal_masked_img();
+	// B.print_output_img();
 
 
 	// pthread_t my_thread[NN];

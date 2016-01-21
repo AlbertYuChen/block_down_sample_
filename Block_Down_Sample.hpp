@@ -107,7 +107,7 @@ private:
 	int OUT_size;
 
 	/*	number of threads will be used in the calculation */
-	int M_thread = 2;
+	int M_thread = 1;
 
 	/*	this is the input argument struct designed for pthread_create, the 
 	first void * member is used to pass this class, so that other functions
@@ -123,6 +123,9 @@ private:
 
 	/*	this will view the sub-img using block, and find the most common value*/
 	T most_com_from_sub_img(co_index entr);
+
+	/*	this will convert the steps walked along img to the position on the img.*/
+	co_index counter_to_co_index(co_index entr_index, int step_counter);
 
 	/*	worker functino for each thread*/
 	static void * thread_worker(void *arg);
