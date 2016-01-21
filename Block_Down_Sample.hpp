@@ -85,20 +85,26 @@ private:
 	/*	original image */
 	boost_m_array_t IN;
 
+	/*	output masked image */
+	boost_m_array_t OUT;
+
 	/*	image dimension size list
 	boost::array<long int, 2> D = {{4, 8}};
 	Here, 4 is index 0, 8 is in index 1, but the right side is the lower bit, and
 	the left side is the higher bit*/
 	dim_array_t D;
 
-	/*	mask block dimension size list*/
+	/*	the output image size*/
+	dim_array_t d;
+
+	/*	mask block edge length*/
 	int B;
 
 	/*	How many pixels in the image*/
 	int IN_size;
 
 	/*	How many pixels in the mask block*/
-	int B_size;
+	int OUT_size;
 
 	/*	check whether the input data is valid for calculation*/
 	void check_initialization();
@@ -110,15 +116,23 @@ private:
 	static void * thread_worker(void *arg);
 
 	/*	number of threads will be used in the calculation */
-	int M_thread = 4;
+	int M_thread = 2;
+
+	struct pthread_arg {
+		void * call_class;
+		co_index entr;
+	};
 
 public:
 
 	/*	calculate masked image by block down sampling*/
 	void cal_masked_img();
 
-	/*	this function will print the image in a list, with correspond coordinate.*/
-	void print_img();
+	/*	this function will print the original image in a list.*/
+	void print_original_img();
+
+	/*	this function will print the output image in a list.*/
+	void print_output_img();
 
 	/*	class constructor*/
 	Block_Down_Sample(
@@ -127,7 +141,7 @@ public:
 		int blk_dim) : 
 			IN(img), 			// constructor need img input as boost multiple array
 			D(img_dim),			// dimension array
-			B(blk_dim) {		// block dimension size
+			B(blk_dim) {		// mask block edge length
 		check_initialization();
 	};
 

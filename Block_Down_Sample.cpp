@@ -12,28 +12,33 @@ void Block_Down_Sample<T, N>::cal_masked_img(){
 
 	pthread_t my_thread[M_thread];
 
-	long id;
-	for(id = 1; id <= M_thread; id++) {
-	        int ret =  pthread_create(&my_thread[id], NULL, &thread_worker, (void*)id);
-	        if(ret != 0) {
-	                printf("Error: pthread_create() failed\n");
-	                exit(EXIT_FAILURE);
-	        }
+	for(int id = 1; id <= M_thread; id++) {
+		co_index entr;
+		entr[0] = 1;
+		entr[1] = 3;
+		pthread_arg arg;
+		arg.call_class = (void *)this;
+		arg.entr = entr;
+
+        int ret =  pthread_create(&my_thread[id], NULL, thread_worker, (void *)&arg);
+		if(ret != 0) { perror("pthread_create failed\n"); exit(EXIT_FAILURE); }
 	}
 
-    pthread_exit(NULL);
+	for(int id = 1; id <= M_thread; id++) {
+		int ret = pthread_join(my_thread[id], 0);
+		if(ret != 0) {  perror("pthread_join failed"); exit(EXIT_FAILURE);}
+	}
+
 };
 
 /*	worker functino for each thread*/
 template <class T, int N>
-static void * Block_Down_Sample<T, N>::thread_worker(void *arg){
+void * Block_Down_Sample<T, N>::thread_worker(void * arg) {
+	printf("This is worker_thread #%d \n",  11);
 
-	// co_index entr;
-	// entr[0] = 1;
-	// entr[1] = 3;
-	// most_com_from_sub_img(entr);
+	co_index my_entr = (co_index)(((pthread_arg * )arg)->entr);
+	((Block_Down_Sample *) ((pthread_arg * )arg)->call_class)->most_com_from_sub_img(my_entr);
 
-    printf("This is worker_thread #%ld\n", (long)arg);
     pthread_exit(NULL);
 };
 
@@ -50,7 +55,7 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	std::map<T, int> M_counter;
 
 	int counter[N] = {0};
-	for (int i = 0; i < B_size; ++i) {
+	for (int i = 0; i < OUT_size; ++i) {
 
 		/*	entr is the entrence of the original image,  
 		the index of block = entrence + offset. 
@@ -86,7 +91,7 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 
 /*	this function will print the image in a list, with correspond coordinate.*/
 template <class T, int N>
-void Block_Down_Sample<T, N>::print_img(){
+void Block_Down_Sample<T, N>::print_original_img(){
 
 	co_index img_index;
 	std::fill( img_index.begin(), img_index.end(), 0);
@@ -128,9 +133,36 @@ void Block_Down_Sample<T, N>::check_initialization(){
 		} 
 	} 
 
-	IN_size = 1; B_size = 1;
+	IN_size = 1; OUT_size = 1;
 	for(int i = 0; i < N; i++) {
 		IN_size *= D[i];
-		B_size *= B;
+		OUT_size *= B;
 	}
+
+	for (int i = 0; i < N; ++i)
+		d[i] = D[i] >> 1;
+	OUT.resize(d);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
