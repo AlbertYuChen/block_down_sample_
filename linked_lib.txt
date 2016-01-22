@@ -1,4 +1,0 @@
-[H[2Jrm *.o block_down_sample.exe 
-g++ --trace Block_Down_Sample.cpp -I ./zi_lib/ -I ./zi_lib/external/include  -pthread -lpthread -std=c++11 -fpermissive -c -o Block_Down_Sample.o
-g++ --trace main.cpp -I ./zi_lib/ -I ./zi_lib/external/include  -pthread -lpthread -std=c++11 -fpermissive -c -o main.o
-g++ Block_Down_Sample.o main.o -pthread -lpthread -std=c++11 -fpermissive -o block_down_sample.exe
