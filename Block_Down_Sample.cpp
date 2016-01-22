@@ -23,7 +23,7 @@ void Block_Down_Sample<T, N>::cal_masked_img(int number_threads){
 		arg->entr = entr;
 		arg->t_id = id;
 
-        int ret =  pthread_create(&my_thread[id], NULL, thread_worker, (void *)arg);
+		int ret =  pthread_create(&my_thread[id], NULL, thread_worker, (void *)arg);
 		if(ret != 0) { perror("pthread_create failed\n"); exit(EXIT_FAILURE);}
 	}
 
@@ -109,8 +109,8 @@ T Block_Down_Sample<T, N>::most_com_from_sub_img(co_index entr){
 	}
 
 	auto x = std::max_element(M_counter.begin(), M_counter.end(),
-    [](const pair<T, int> p1, const pair<T, int> p2) {
-        return p1.second < p2.second; });
+	[](const pair<T, int> p1, const pair<T, int> p2) {
+		return p1.second < p2.second; });
 	return x->first;
 };
 
@@ -200,5 +200,4 @@ void Block_Down_Sample<T, N>::check_initialization(){
 		OUT_size *= d[i];
 		B_size *= B;
 	}
-
 };

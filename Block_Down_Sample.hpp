@@ -13,7 +13,7 @@ NOTE:
 the boost multi array documentation is available through:
 http://www.boost.org/doc/libs/master/libs/multi_array/doc/user.html
 I download the library from:
-
+https://github.com/zlateski/zi_lib.git
 */
 #include "boost/multi_array.hpp"
 
@@ -40,8 +40,8 @@ private:
 
 	/*	define the type of the dimension array, need to be consistent with the 
 	boost default array shape settings, which usually used in the following case.
-    boost::array<array_type::index, 4> shape = LL;
-    array_type A(shape); */
+	boost::array<array_type::index, 4> shape = LL;
+	array_type A(shape); */
 	typedef typename boost::array<long int, N> dim_array_t;
 
 	/*	the iteration way to access boost array (not multi array)

@@ -16,7 +16,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(CFLAGS) -o $@
 
 .cpp.o:
-	$(CC) $^ $(INCLUDES) $(CFLAGS) -c -o $@
+	$(CC) --trace $^ $(INCLUDES) $(CFLAGS) -c -o $@
 
 .PHONY: clean
 
